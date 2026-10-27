@@ -9,7 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="Seminologia">
 <meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#05060A" media="(prefers-color-scheme: dark)">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%231A7A35'/%3E%3Cellipse cx='70' cy='90' rx='26' ry='18' fill='white'/%3E%3Cpath d='M96 90q30 18 60-6' stroke='white' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 <title>Seminologia Lab</title>
 
@@ -337,6 +338,26 @@ body.in-conta .wrap{padding-bottom:calc(84px + clamp(150px,30svh,290px) + 24px +
 @media (max-width:360px){#view-conta .act{font-size:.875rem;gap:4px} #view-conta .act svg{width:16px;height:16px}}
 @media (max-height:700px){#view-conta .head{padding-top:8px} #view-conta h1{font-size:1.75rem} #view-conta .ring-wrap{padding:12px 14px} #view-conta .ring{width:80px;height:80px}}
 
+/* ===== Clean Apple white + fixed chrome ===== */
+:root{--bg:#FFFFFF;--fill:#F5F5F7;--fg2:#636366;--card2:#FFFFFF;--glass:rgba(255,255,255,.72);--glass-strong:rgba(255,255,255,.86);--glass-border:rgba(0,0,0,.06);--glass-shadow:rgba(0,0,0,.10)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000000;--fill:#1C1C1E;--card2:#2C2C2E;--glass:rgba(30,30,32,.72);--glass-strong:rgba(28,28,30,.88);--glass-border:rgba(255,255,255,.10);--glass-shadow:rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:#000000;--fill:#1C1C1E;--card2:#2C2C2E;--glass:rgba(30,30,32,.72);--glass-strong:rgba(28,28,30,.88);--glass-border:rgba(255,255,255,.10);--glass-shadow:rgba(0,0,0,.5)}
+.bg{display:none}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+.scroller{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;
+  padding-top:env(safe-area-inset-top,0px);scrollbar-gutter:stable}
+.card,.act{background:var(--fill);border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.sheet .card{background:var(--fill)}
+.seg{background:var(--fill);border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.seg button[aria-selected="true"],:root[data-theme="dark"] .seg button[aria-selected="true"]{background:var(--bg);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg button[aria-selected="true"]{background:#3A3A3C}}
+:root[data-theme="dark"] .seg button[aria-selected="true"]{background:#3A3A3C}
+.target .seg{background:var(--card2);box-shadow:none}
+.target .seg button[aria-selected="true"]{background:var(--fill)}
+.tabbar{bottom:calc(8px + env(safe-area-inset-bottom,0px));width:min(360px,calc(100vw - 32px));transform:translateZ(0)}
+.tabbar,.timer,.toast{box-shadow:inset 0 1px 0 var(--glass-hi),0 8px 28px var(--glass-shadow)}
+.kbd kbd{background:var(--fill);border-color:var(--sep)}
+
 @media (prefers-reduced-transparency:reduce){
   .card,.seg,.tabbar,.sheet,.act,.timer,.toast,.btn.plain,.pad{-webkit-backdrop-filter:none;backdrop-filter:none}
   .card,.seg,.tabbar,.act,.btn.plain,.timer,.toast{background:var(--card)} .sheet{background:var(--bg)}
@@ -347,8 +368,7 @@ body.in-conta .wrap{padding-bottom:calc(84px + clamp(150px,30svh,290px) + 24px +
 <body>
 
 
-<div class="bg" aria-hidden="true"></div>
-<div class="wrap">
+<div class="scroller" id="scroller"><div class="wrap">
 
 <!-- ============ PROTOCOLLI ============ -->
 <section id="view-protocolli">
@@ -697,7 +717,7 @@ body.in-conta .wrap{padding-bottom:calc(84px + clamp(150px,30svh,290px) + 24px +
   </div>
   <p class="kbd">Da tastiera: <kbd>V</kbd> vivo · <kbd>M</kbd> morto · <kbd>⌫</kbd> annulla · <kbd>Invio</kbd> fine</p>
 </section>
-</div>
+</div></div>
 
 <nav class="tabbar" role="tablist" aria-label="Sezioni">
   <button class="tab" role="tab" data-view="protocolli" aria-selected="true">
@@ -767,7 +787,7 @@ body.in-conta .wrap{padding-bottom:calc(84px + clamp(150px,30svh,290px) + 24px +
     $('#view-conta').hidden = view !== 'conta';
     $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.view === view));
     if(location.hash !== '#'+view) history.replaceState(null,'','#'+view);
-    window.scrollTo(0,0);
+    const sc=document.getElementById('scroller'); if(sc) sc.scrollTop=0;
   }
   $$('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.view)));
   $$('[data-goto]').forEach(b => b.addEventListener('click', () => show(b.dataset.goto)));

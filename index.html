@@ -2,6 +2,9 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'; connect-src 'none'; frame-src 'none'; manifest-src 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="format-detection" content="telephone=no">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -358,6 +361,25 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 .tabbar,.timer,.toast{box-shadow:inset 0 1px 0 var(--glass-hi),0 8px 28px var(--glass-shadow)}
 .kbd kbd{background:var(--fill);border-color:var(--sep)}
 
+/* ===== Performance (iOS WebKit) ===== */
+/* only the tab bar keeps a live blur; everything else is solid or blurs only while visible */
+.pad,.tbtn,.btn.plain{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.btn.plain{background:var(--fill)}
+.toast,.timer{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--glass-strong)}
+.timer.done{background:var(--live-btn)}
+.tabbar{-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);contain:layout paint}
+.pads{contain:layout}
+.pad{touch-action:none;-webkit-touch-callout:none;will-change:transform}
+button,.step,.chip{-webkit-touch-callout:none}
+/* views stay laid out; the inactive one is skipped by the renderer, so switching does no relayout */
+.view.off{content-visibility:hidden;contain:strict;height:0;overflow:hidden;visibility:hidden}
+.view.off .pads,.view.off .timer{visibility:hidden}
+.sheet{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
+.steps,.figure{content-visibility:auto;contain-intrinsic-size:auto 600px}
+.tab{transition:none}
+.seg button{transition:none}
+.scroller{scrollbar-gutter:auto}
+
 @media (prefers-reduced-transparency:reduce){
   .card,.seg,.tabbar,.sheet,.act,.timer,.toast,.btn.plain,.pad{-webkit-backdrop-filter:none;backdrop-filter:none}
   .card,.seg,.tabbar,.act,.btn.plain,.timer,.toast{background:var(--card)} .sheet{background:var(--bg)}
@@ -371,7 +393,7 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 <div class="scroller" id="scroller"><div class="wrap">
 
 <!-- ============ PROTOCOLLI ============ -->
-<section id="view-protocolli">
+<section id="view-protocolli" class="view">
   <header class="head">
     <div class="eyebrow">Laboratorio di seminologia</div>
     <h1>Protocolli</h1>
@@ -472,14 +494,13 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
     <div class="group-label">Come leggere il vetrino</div>
     <div class="card figure">
       <svg viewBox="0 0 640 200" role="img" aria-label="Campo microscopico su fondo scuro di nigrosina: teste incolori sono vive, teste rosse e rosa tenue sono morte">
+        <defs><g id="sperm-live"><ellipse class="f-live" rx="9" ry="6"/><path class="s-live" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 6 28 -2t26 2"/></g><g id="sperm-dead"><ellipse class="f-dead" rx="9" ry="6"/><path class="s-dead" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 -6 28 2t26 -2"/></g></defs>
         <rect class="f-nig field" x="1" y="1" width="638" height="198" rx="14"/>
-        <g id="sperm-live"><ellipse class="f-live" rx="9" ry="6"/><path class="s-live" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 6 28 -2t26 2"/></g>
         <use href="#sperm-live" transform="translate(70 60) rotate(-15)"/>
         <use href="#sperm-live" transform="translate(150 140) rotate(20)"/>
         <use href="#sperm-live" transform="translate(300 50) rotate(160)"/>
         <use href="#sperm-live" transform="translate(470 130) rotate(-30)"/>
         <use href="#sperm-live" transform="translate(560 55) rotate(100)"/>
-        <g id="sperm-dead"><ellipse class="f-dead" rx="9" ry="6"/><path class="s-dead" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 -6 28 2t26 -2"/></g>
         <use href="#sperm-dead" transform="translate(230 110) rotate(-60)"/>
         <use href="#sperm-dead" transform="translate(380 160) rotate(10)"/>
         <use href="#sperm-dead" transform="translate(420 70) rotate(200)"/>
@@ -676,7 +697,7 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 </section>
 
 <!-- ============ CONTA ============ -->
-<section id="view-conta" hidden>
+<section id="view-conta" class="view off" inert aria-hidden="true">
   <header class="head">
     <div class="eyebrow">Vitalità · eosina–nigrosina</div>
     <h1>Contatore</h1>
@@ -779,24 +800,37 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
   const buzz = ms => { try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} };
 
   /* ---------- Navigation ---------- */
+  const VIEWS = ['protocolli','conta'];
+  const scrollPos = {protocolli:0, conta:0};
+  let current = null;
   function show(view){
-    if(!['protocolli','conta'].includes(view)) view = 'protocolli';
+    if(!VIEWS.includes(view)) view = 'protocolli';
+    try{ if(location.hash !== '#'+view) history.replaceState(null,'','#'+view); }catch(e){}
+    if(view === current) return;
     if(typeof close === 'function') close();
+    const sc = document.getElementById('scroller');
+    if(current && sc) scrollPos[current] = sc.scrollTop;
+    VIEWS.forEach(v => {
+      const el = document.getElementById('view-'+v), on = v === view;
+      el.classList.toggle('off', !on);
+      if(on){ el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); }
+      else { el.setAttribute('inert',''); el.setAttribute('aria-hidden','true'); }
+    });
     document.body.classList.toggle('in-conta', view === 'conta');
-    $('#view-protocolli').hidden = view !== 'protocolli';
-    $('#view-conta').hidden = view !== 'conta';
-    $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.view === view));
-    if(location.hash !== '#'+view) history.replaceState(null,'','#'+view);
-    const sc=document.getElementById('scroller'); if(sc) sc.scrollTop=0;
+    $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === view)));
+    current = view;
+    if(sc) sc.scrollTop = scrollPos[view] || 0;
+    try{ if(location.hash !== '#'+view) history.replaceState(null,'','#'+view); }catch(e){}
   }
   $$('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.view)));
   $$('[data-goto]').forEach(b => b.addEventListener('click', () => show(b.dataset.goto)));
   window.addEventListener('hashchange', () => show(location.hash.slice(1)));
 
   function proto(p){
+    if(p !== 'vital' && p !== 'grad') p = 'vital';
     $('#proto-vital').hidden = p !== 'vital';
     $('#proto-grad').hidden = p !== 'grad';
-    $$('[data-proto]').forEach(b => b.setAttribute('aria-selected', b.dataset.proto === p));
+    $$('[data-proto]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.proto === p)));
     store.set('sem.proto', p);
   }
   $$('[data-proto]').forEach(b => b.addEventListener('click', () => proto(b.dataset.proto)));
@@ -850,12 +884,24 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
     $('#timer').classList.remove('done'); $('#timer').classList.add('on');
     clearInterval(tInt); tick(); tInt = setInterval(tick, 250);
   }));
+  document.addEventListener('visibilitychange', () => { if(!document.hidden && tInt) tick(); });
   $('#timer-stop').addEventListener('click', () => { clearInterval(tInt); tInt = null; $('#timer').classList.remove('on','done'); });
 
   /* ---------- Counter ---------- */
   const MAX = 9999;
-  let st = store.get('sem.count', {live:0, dead:0, hist:[], target:200});
-  if(!Array.isArray(st.hist)) st.hist = [];
+  function clean(raw){
+    const n = v => (Number.isInteger(v) && v >= 0 && v <= MAX) ? v : 0;
+    const o = (raw && typeof raw === 'object') ? raw : {};
+    let live = n(o.live), dead = n(o.dead);
+    if(live + dead > MAX){ live = 0; dead = 0; }
+    const target = o.target === 100 ? 100 : 200;
+    let hist = Array.isArray(o.hist) ? o.hist.filter(k => k === 'live' || k === 'dead').slice(-2000) : [];
+    // history may never claim more taps than the counts hold
+    const hl = hist.filter(k => k === 'live').length, hd = hist.length - hl;
+    if(hl > live || hd > dead) hist = [];
+    return {live, dead, hist, target};
+  }
+  let st = clean(store.get('sem.count', null));
   const C = 2*Math.PI*42;
 
   function pctLive(){ const t = st.live + st.dead; return t ? st.live/t*100 : 0; }
@@ -878,14 +924,15 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
     if(tot){
       $('#live-pct').textContent = fmt1.format(pctLive()) + '% vivi';
       const rem = st.target - tot;
-      $('#live-sub').innerHTML = rem > 0 ? `Mancano ${fmt.format(rem)} ${rem === 1 ? 'cellula' : 'cellule'}` : `<span class="reached">Obiettivo raggiunto</span>`;
-    } else { $('#live-pct').textContent = '—'; $('#live-sub').textContent = 'Inizia a contare'; }
-    $$('[data-target]').forEach(b => b.setAttribute('aria-selected', +b.dataset.target === st.target));
+      const ls = $('#live-sub'); ls.textContent = rem > 0 ? `Mancano ${fmt.format(rem)} ${rem === 1 ? 'cellula' : 'cellule'}` : 'Obiettivo raggiunto'; ls.classList.toggle('reached', rem <= 0);
+    } else { $('#live-pct').textContent = '—'; $('#live-sub').textContent = 'Inizia a contare'; $('#live-sub').classList.remove('reached'); }
+    $$('[data-target]').forEach(b => b.setAttribute('aria-selected', String(+b.dataset.target === st.target)));
     $('#btn-undo').disabled = !st.hist.length;
     $('#btn-reset').disabled = !tot;
     $('#btn-end').disabled = !tot;
     store.set('sem.count', st);
   }
+  window.addEventListener('storage', e => { if(e.key === 'sem.count'){ st = clean(store.get('sem.count', null)); render(); } });
   function add(kind){
     if(st.live + st.dead >= MAX){ toast('Limite di 9.999 cellule'); return; }
     st[kind]++; st.hist.push(kind); if(st.hist.length > 2000) st.hist.shift();
@@ -903,10 +950,12 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
   function reset(){ st.live = 0; st.dead = 0; st.hist = []; render(); }
 
   // press on pointer-down for instant response (no 300ms delay)
+  let lastDown = -1e9;
   [['#pad-live','live'],['#pad-dead','dead']].forEach(([sel,kind]) => {
     const el = $(sel);
     el.addEventListener('pointerdown', e => {
-      if(e.button > 0) return;
+      if(e.button > 0 || !e.isPrimary && e.pointerType === 'mouse') return;
+      lastDown = performance.now();
       el.classList.add('pressed');
       const r = el.getBoundingClientRect(), d = Math.max(r.width, r.height)*2;
       const rp = document.createElement('span'); rp.className = 'ripple';
@@ -916,24 +965,26 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
     });
     const up = () => el.classList.remove('pressed');
     el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
-    el.addEventListener('click', e => { if(e.detail === 0) add(kind); }); // keyboard activation
+    el.addEventListener('click', e => { if(performance.now() - lastDown > 600) add(kind); }); // keyboard / VoiceOver activation
     el.addEventListener('contextmenu', e => e.preventDefault());
   });
   $('#btn-undo').addEventListener('click', undo);
   $$('[data-target]').forEach(b => b.addEventListener('click', () => { st.target = +b.dataset.target; render(); }));
 
   /* ---------- Sheets ---------- */
+  let lastFocus = null;
   function open(id){
     const s = $(id), sc = $('#scrim');
     sc.hidden = false; s.hidden = false;
     requestAnimationFrame(() => { sc.classList.add('on'); s.classList.add('on'); });
-    openSheet = s; s.querySelector('button').focus({preventScroll:true});
+    openSheet = s; lastFocus = document.activeElement; s.querySelector('button').focus({preventScroll:true});
   }
   function close(){
     if(!openSheet) return;
     const s = openSheet, sc = $('#scrim'); openSheet = null;
     s.classList.remove('on'); sc.classList.remove('on');
-    setTimeout(() => { s.hidden = true; sc.hidden = true; }, 380);
+    setTimeout(() => { if(openSheet !== s){ s.hidden = true; if(!openSheet) sc.hidden = true; } }, 380);
+    try{ lastFocus && lastFocus.focus({preventScroll:true}); }catch(e){}
   }
   $('#scrim').addEventListener('click', close);
   $$('[data-close]').forEach(b => b.addEventListener('click', close));
@@ -948,14 +999,14 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
   let lastText = '';
   function finish(){
     const tot = st.live + st.dead; if(!tot) return;
-    const pl = st.live/tot*100, pd = 100 - pl;
+    const pl = Math.round(st.live/tot*1000)/10, pd = Math.round((100 - pl)*10)/10;
     const c = cls(pl);
     $('#r-pct').textContent = fmt1.format(pl) + '%';
     $('#r-pct').style.color = c.fg;
     $('#r-pill').textContent = c.t; $('#r-pill').style.background = c.bg; $('#r-pill').style.color = c.fg;
     $('#r-bar-a').style.width = pl + '%'; $('#r-bar-b').style.width = pd + '%';
-    $('#r-live').innerHTML = `${fmt.format(st.live)}<small>${fmt1.format(pl)}%</small>`;
-    $('#r-dead').innerHTML = `${fmt.format(st.dead)}<small>${fmt1.format(pd)}%</small>`;
+    const setRow = (el, n, pc) => { const sm = document.createElement('small'); sm.textContent = fmt1.format(pc) + '%'; el.replaceChildren(fmt.format(n), sm); };
+    setRow($('#r-live'), st.live, pl); setRow($('#r-dead'), st.dead, pd);
     $('#r-tot').textContent = fmt.format(tot);
     const w = $('#r-warn');
     if(tot < 100){ w.hidden = false; $('#r-warn-t').textContent = `Hai contato ${fmt.format(tot)} ${tot === 1 ? 'cellula' : 'cellule'}. Il foglietto VitalScreen indica 100–200 cellule per un risultato affidabile.`; }
@@ -979,7 +1030,14 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
   /* ---------- Keyboard ---------- */
   document.addEventListener('keydown', e => {
     if(e.key === 'Escape'){ close(); return; }
-    if($('#view-conta').hidden || openSheet || e.metaKey || e.ctrlKey || e.altKey) return;
+    if(e.key === 'Tab' && openSheet){
+      const f = [...openSheet.querySelectorAll('button:not([disabled])')]; if(!f.length) return;
+      const i = f.indexOf(document.activeElement);
+      if(e.shiftKey && i <= 0){ e.preventDefault(); f[f.length-1].focus(); }
+      else if(!e.shiftKey && i === f.length-1){ e.preventDefault(); f[0].focus(); }
+      return;
+    }
+    if(current !== 'conta' || openSheet || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key.toLowerCase();
     if(k === 'v' || k === '1'){ e.preventDefault(); add('live'); }
     else if(k === 'm' || k === '2'){ e.preventDefault(); add('dead'); }

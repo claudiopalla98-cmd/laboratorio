@@ -380,6 +380,22 @@ button,.step,.chip{-webkit-touch-callout:none}
 .seg button{transition:none}
 .scroller{scrollbar-gutter:auto}
 
+/* ===== Tab bar: native iOS position and height ===== */
+:root{--tab-h:54px;--tab-off:max(10px,calc(env(safe-area-inset-bottom,0px) - 12px))}
+.tabbar{bottom:var(--tab-off);height:var(--tab-h);padding:4px;gap:2px;align-items:stretch}
+.tab{padding:3px 0 2px;gap:1px;font-size:.6875rem;font-weight:600;justify-content:center}
+.tab svg{width:22px;height:22px}
+.pads{bottom:calc(var(--tab-off) + var(--tab-h) + 12px)}
+.wrap{padding-bottom:calc(var(--tab-off) + var(--tab-h) + 24px)}
+body.in-conta .wrap{padding-bottom:calc(var(--tab-off) + var(--tab-h) + 12px + clamp(150px,30svh,290px) + 16px)}
+@media (max-height:620px){body.in-conta .wrap{padding-bottom:calc(var(--tab-off) + var(--tab-h) + 12px + 130px + 16px)}}
+.timer{bottom:auto}
+
+/* iOS standalone: layout viewport can end above the screen bottom; --ios-gap is measured in JS */
+.tabbar{bottom:calc(var(--tab-off) - var(--ios-gap,0px))}
+.pads{bottom:calc(var(--tab-off) + var(--tab-h) + 12px - var(--ios-gap,0px))}
+.scroller{bottom:calc(0px - var(--ios-gap,0px))}
+
 @media (prefers-reduced-transparency:reduce){
   .card,.seg,.tabbar,.sheet,.act,.timer,.toast,.btn.plain,.pad{-webkit-backdrop-filter:none;backdrop-filter:none}
   .card,.seg,.tabbar,.act,.btn.plain,.timer,.toast{background:var(--card)} .sheet{background:var(--bg)}
@@ -426,8 +442,8 @@ button,.step,.chip{-webkit-touch-callout:none}
           <rect class="f-card s-tube" stroke-width="2" x="40" y="10" width="40" height="9" rx="3"/>
           <path class="f-eos" d="M22 14c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
           <path class="f-eos" d="M22 34c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
-          <text class="svgt" x="92" y="40" font-size="11" font-weight="700">50</text><text class="svgt2" x="92" y="52" font-size="9">µL</text>
-          <text class="svgt2" x="14" y="68" font-size="9">R1 ×2</text>
+          <text class="svgt" x="92" y="40" font-size="11" font-weight="700">50</text><text class="svgt2" x="92" y="52" font-size="11">µL</text>
+          <text class="svgt2" x="14" y="68" font-size="11">R1 ×2</text>
         </svg></div>
         <div class="body">
           <div class="row"><span class="n">1</span><h3>Seme + eosina</h3><button class="check" aria-label="Segna passaggio 1 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -442,7 +458,7 @@ button,.step,.chip{-webkit-touch-callout:none}
           <path class="f-nig" d="M22 28c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
           <path class="f-nig" d="M22 48c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
           <circle class="f-none s-tint" stroke-width="2" cx="99" cy="38" r="13"/><path class="s-tint" stroke-width="2" stroke-linecap="round" d="M99 30v8l5 3"/>
-          <text class="svgt2" x="88" y="66" font-size="9">≤ 30 s</text>
+          <text class="svgt2" x="88" y="66" font-size="11">≤ 30 s</text>
         </svg></div>
         <div class="body">
           <div class="row"><span class="n">2</span><h3>Aggiungi nigrosina</h3><button class="check" aria-label="Segna passaggio 2 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -629,7 +645,7 @@ button,.step,.chip{-webkit-touch-callout:none}
           <clipPath id="g4"><path d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/></clipPath>
           <g clip-path="url(#g4)"><rect class="f-l80" x="40" y="44" width="40" height="40"/><rect class="f-l40" x="40" y="30" width="40" height="14"/><rect class="f-semen" x="40" y="18" width="40" height="12"/></g>
           <path class="f-none s-tube" stroke-width="2" d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/>
-          <text class="svgt2" x="80" y="28" font-size="10">seme</text>
+          <text class="svgt2" x="80" y="28" font-size="11">seme</text>
         </svg></div>
         <div class="body">
           <div class="row"><span class="n">4</span><h3>Stratifica il seme</h3><button class="check" aria-label="Segna passaggio 4 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -798,6 +814,24 @@ button,.step,.chip{-webkit-touch-callout:none}
   };
   let openSheet = null;
   const buzz = ms => { try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} };
+
+  /* ---------- iOS home-screen viewport fix ---------- */
+  function fixViewport(){
+    let g = 0;
+    try{
+      const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+      const portrait = innerHeight > innerWidth;
+      if(standalone && portrait){
+        g = Math.round(screen.height - innerHeight);
+        if(!(g > 0 && g <= 120)) g = 0;
+      }
+    }catch(e){ g = 0; }
+    document.documentElement.style.setProperty('--ios-gap', g + 'px');
+  }
+  fixViewport();
+  addEventListener('resize', fixViewport);
+  addEventListener('orientationchange', () => setTimeout(fixViewport, 300));
+  addEventListener('pageshow', fixViewport);
 
   /* ---------- Navigation ---------- */
   const VIEWS = ['protocolli','conta'];

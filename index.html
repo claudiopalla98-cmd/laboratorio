@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Seminologia">
+<meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#05060A" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%231A7A35'/%3E%3Cellipse cx='70' cy='90' rx='26' ry='18' fill='white'/%3E%3Cpath d='M96 90q30 18 60-6' stroke='white' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Seminologia Lab</title>
+
+<style>
+/* Layout: iOS single column, large title; Liquid Glass cards over soft color field; floating capsule tab bar; counter pads docked above it */
+:root{
+  --bg:#F2F2F7; --card:#FFFFFF; --card2:#F7F7FA; --fg:#1C1C1E; --fg2:rgba(60,60,67,.62); --fg3:rgba(60,60,67,.32);
+  --sep:rgba(60,60,67,.16); --tint:#0066D6; --tint-soft:rgba(0,122,255,.12); --tint-btn:#0066D6;
+  --live:#1E7E34; --live-soft:rgba(52,199,89,.14); --live-btn:#1A7A35;
+  --dead:#C8103F; --dead-soft:rgba(255,45,85,.12); --dead-btn:#D61E4D;
+  --warn:#985700; --warn-soft:rgba(255,149,0,.14);
+  --nig:#1E1E22; --nig-rim:#3A3A40; --head-live:#F4F1EA; --head-dead:#E8456B; --head-faint:#F2A9BC;
+  --l80:#C9DDF7; --l40:#E4EEFB; --semen:#F3EBCF; --tube:#8E8E93; --pellet:#D49A2A;
+  --bar:rgba(249,249,251,.78); --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.06);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  --font-d:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000000; --card:#1C1C1E; --card2:#2C2C2E; --fg:#F2F2F7; --fg2:rgba(235,235,245,.62); --fg3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.55); --tint:#4DA3FF; --tint-soft:rgba(10,132,255,.2); --tint-btn:#0066D6;
+  --live:#30D158; --live-soft:rgba(48,209,88,.18); --live-btn:#1A7A35;
+  --dead:#FF6482; --dead-soft:rgba(255,55,95,.2); --dead-btn:#D61E4D;
+  --warn:#FFB340; --warn-soft:rgba(255,159,10,.2);
+  --l80:#2B4A72; --l40:#1F3550; --semen:#5A5236; --tube:#8E8E93; --pellet:#E0A93A;
+  --bar:rgba(22,22,24,.78); --shadow:none; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000000; --card:#1C1C1E; --card2:#2C2C2E; --fg:#F2F2F7; --fg2:rgba(235,235,245,.62); --fg3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.55); --tint:#4DA3FF; --tint-soft:rgba(10,132,255,.2); --tint-btn:#0066D6;
+  --live:#30D158; --live-soft:rgba(48,209,88,.18); --live-btn:#1A7A35;
+  --dead:#FF6482; --dead-soft:rgba(255,55,95,.2); --dead-btn:#D61E4D;
+  --warn:#FFB340; --warn-soft:rgba(255,159,10,.2);
+  --l80:#2B4A72; --l40:#1F3550; --semen:#5A5236; --tube:#8E8E93; --pellet:#E0A93A;
+  --bar:rgba(22,22,24,.78); --shadow:none; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font:400 1rem/1.45 var(--font);letter-spacing:-.01em;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+:focus-visible{outline:3px solid var(--tint);outline-offset:2px;border-radius:10px}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:8px calc(96px + env(safe-area-inset-bottom,0px))}
+.num{font-variant-numeric:tabular-nums}
+
+/* Large title */
+.head{padding:18px 4px 10px}
+.eyebrow{font-size:.8125rem;font-weight:600;color:var(--fg2);letter-spacing:.02em;text-transform:uppercase}
+h1{font:700 2.125rem/1.1 var(--font-d);letter-spacing:-.025em;margin:2px 0 0;text-wrap:balance}
+h2{font:700 1.375rem/1.2 var(--font-d);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h3{font:600 1.0625rem/1.3 var(--font);letter-spacing:-.015em;margin:0}
+
+/* Segmented control */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--fg3);background:color-mix(in srgb,var(--fg) 8%,transparent);
+  border-radius:10px;padding:2px;gap:2px;margin:6px 0 18px;position:relative}
+.seg button{padding:7px 8px;border-radius:8px;font-size:.875rem;font-weight:500;color:var(--fg);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .2s,box-shadow .2s}
+.seg button[aria-selected="true"]{background:var(--card);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
+:root[data-theme="dark"] .seg button[aria-selected="true"]{background:#636366}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg button[aria-selected="true"]{background:#636366}}
+
+/* Cards */
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow)}
+.group-label{font-size:.8125rem;color:var(--fg2);text-transform:uppercase;letter-spacing:.03em;margin:26px 16px 8px;font-weight:500}
+.foot{font-size:.8125rem;color:var(--fg2);margin:8px 16px 0;line-height:1.4}
+
+.summary{padding:18px}
+.summary p{margin:6px 0 0;color:var(--fg2);font-size:.9375rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{display:inline-flex;align-items:baseline;gap:6px;background:var(--card2);border-radius:999px;padding:6px 12px;font-size:.875rem;white-space:nowrap}
+.chip b{font-weight:600}
+.chip span{color:var(--fg2)}
+
+/* Steps */
+.steps{list-style:none;margin:0;padding:0}
+.step{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:14px 16px;position:relative}
+.step+.step::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.step .ill{width:96px;height:72px;flex-shrink:0;border-radius:12px;background:var(--card2);display:grid;place-items:center}
+.step .ill svg{width:88px;height:64px}
+.step .body{min-width:0}
+.step .row{display:flex;align-items:flex-start;gap:10px}
+.step .n{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--tint-soft);color:var(--tint);font-size:.8125rem;font-weight:700;display:grid;place-items:center;margin-top:1px}
+.step h3{flex:1;min-width:0}
+.step p{margin:4px 0 0;color:var(--fg2);font-size:.9375rem}
+.step p strong{color:var(--fg);font-weight:600}
+.check{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--fg3);display:grid;place-items:center;transition:background .18s,border-color .18s,transform .1s}
+.check svg{width:14px;height:14px;opacity:0;transition:opacity .15s}
+.check:active{transform:scale(.9)}
+.step.done .check{background:var(--live-btn);border-color:var(--live-btn)}
+.step.done .check svg{opacity:1}
+.step.done h3,.step.done p{opacity:.45}
+.timers{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tbtn{display:inline-flex;align-items:center;gap:6px;background:var(--tint-soft);color:var(--tint);font-weight:600;font-size:.875rem;padding:6px 12px;border-radius:999px;transition:transform .1s}
+.tbtn:active{transform:scale(.96)}
+.tbtn svg{width:15px;height:15px}
+.restart{display:block;margin:10px auto 0;color:var(--tint);font-size:.9375rem;padding:8px 12px}
+
+/* Infographic panels */
+.figure{padding:16px}
+.figure svg{display:block;width:100%;height:auto}
+.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.legend div{display:flex;align-items:center;gap:8px;font-size:.875rem;min-width:0}
+.legend i{flex-shrink:0;width:14px;height:10px;border-radius:50%/60%;border:1px solid var(--nig-rim)}
+.legend small{display:block;color:var(--fg2);font-size:.75rem}
+.scale{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.scale div{border-radius:12px;padding:10px 12px;min-width:0}
+.scale b{display:block;font-size:1.0625rem;font-weight:700}
+.scale span{font-size:.8125rem;color:var(--fg2)}
+.s-bad{background:var(--dead-soft)} .s-bad b{color:var(--dead)}
+.s-grey{background:var(--warn-soft)} .s-grey b{color:var(--warn)}
+.s-ok{background:var(--live-soft)} .s-ok b{color:var(--live)}
+.note{display:flex;gap:12px;padding:14px 16px;font-size:.9375rem;color:var(--fg2)}
+.note+.note{border-top:.5px solid var(--sep)}
+.note svg{flex-shrink:0;width:20px;height:20px;color:var(--warn);margin-top:2px}
+.note strong{color:var(--fg);font-weight:600}
+
+/* SVG paint tokens */
+.f-card{fill:var(--card)} .f-card2{fill:var(--card2)} .f-nig{fill:var(--nig)} .f-l80{fill:var(--l80)} .f-l40{fill:var(--l40)}
+.f-semen{fill:var(--semen)} .f-pellet{fill:var(--pellet)} .f-live{fill:var(--head-live)} .f-dead{fill:var(--head-dead)} .f-faint{fill:var(--head-faint)}
+.f-tint{fill:var(--tint)} .f-eos{fill:var(--dead-btn)} .f-fg{fill:var(--fg)} .f-fg2{fill:var(--fg2)} .f-none{fill:none}
+.s-tube{stroke:var(--tube)} .s-fg2{stroke:var(--fg2)} .s-sep{stroke:var(--fg3)} .s-tint{stroke:var(--tint)} .s-live{stroke:var(--head-live)} .s-dead{stroke:var(--head-dead)}
+.svgt{font-family:var(--font);fill:var(--fg)} .svgt2{font-family:var(--font);fill:var(--fg2)}
+
+.tubes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.tubes{grid-template-columns:minmax(0,1fr)}.tubes svg{max-width:340px;margin:0 auto}}
+.field{stroke:var(--nig-rim);stroke-width:2}
+/* Counter */
+.ring-wrap{display:flex;align-items:center;gap:18px;padding:16px 18px}
+.ring{position:relative;width:96px;height:96px;flex-shrink:0}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .track{stroke:var(--card2)} .ring .lv{stroke:var(--live-btn);transition:stroke-dasharray .25s ease-out} .ring .dd{stroke:var(--dead-btn);transition:stroke-dasharray .25s ease-out,stroke-dashoffset .25s ease-out}
+.ring .c{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .c b{font:700 1.625rem/1 var(--font-d);letter-spacing:-.02em}
+.ring .c span{font-size:.75rem;color:var(--fg2);margin-top:2px}
+.ring-info{min-width:0;flex:1}
+.ring-info .big{font:700 1.5rem/1.1 var(--font-d);letter-spacing:-.02em}
+.ring-info .sub{font-size:.875rem;color:var(--fg2);margin-top:2px}
+.target{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.8125rem;color:var(--fg2);flex-wrap:wrap}
+.target .seg{margin:0;width:auto}
+.target .seg button{padding:4px 12px;font-size:.8125rem}
+.reached{color:var(--live);font-weight:600}
+
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.pad{position:relative;height:clamp(200px,42svh,380px);border-radius:24px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  transition:transform .12s cubic-bezier(.2,.8,.2,1),filter .12s;overflow:hidden;min-width:0}
+.pad.live{background:var(--live-btn)} .pad.dead{background:var(--dead-btn)}
+.pad .lbl{font:700 clamp(1.5rem,7vw,2.25rem)/1 var(--font-d);letter-spacing:-.02em;text-transform:uppercase}
+.pad .cnt{font:600 clamp(2.5rem,13vw,4.5rem)/1 var(--font-d);letter-spacing:-.03em;font-variant-numeric:tabular-nums;max-width:100%;padding:0 8px;overflow-wrap:anywhere;text-align:center}
+.pad .hint{font-size:.8125rem;font-weight:600}
+.pad.pressed{transform:scale(.965);filter:brightness(.92)}
+.pad .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);pointer-events:none;animation:rip .45s ease-out forwards}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+.pad .plus{position:absolute;top:14px;right:16px;font-weight:700;font-size:1rem;opacity:0}
+.pad .plus.go{animation:plus .5s ease-out}
+@keyframes plus{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-14px)}}
+
+.actions{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;margin-top:12px}
+.act{height:50px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);font-weight:600;font-size:.9375rem;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .1s,opacity .2s;min-width:0;padding:0 8px}
+.act svg{width:18px;height:18px;flex-shrink:0}
+.act:active{transform:scale(.97)}
+.act[disabled]{opacity:.4;pointer-events:none}
+.act.undo{color:var(--tint)} .act.reset{color:var(--dead)}
+.act.end{background:var(--tint-btn);color:#fff}
+.act span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kbd{font-size:.8125rem;color:var(--fg2);text-align:center;margin-top:14px}
+.kbd kbd{font:600 .75rem var(--mono);background:var(--card);border:.5px solid var(--sep);border-radius:6px;padding:3px 8px;display:inline-block;line-height:1.2}
+@media (hover:none){.kbd{display:none}}
+
+/* Tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bar);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+  border-top:.5px solid var(--sep);padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center;gap:8px}
+.tab{flex:0 1 180px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;font-size:.6875rem;font-weight:500;color:var(--fg2)}
+.tab svg{width:26px;height:26px}
+.tab[aria-selected="true"]{color:var(--tint)}
+
+/* Sheets */
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.36);opacity:0;transition:opacity .25s}
+.scrim.on{opacity:1}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;margin:0 auto;max-width:560px;background:var(--bg);border-radius:20px 20px 0 0;
+  padding:8px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+  transform:translateY(105%);transition:transform .38s cubic-bezier(.32,.72,0,1);max-height:92svh;overflow:auto}
+.sheet.on{transform:none}
+.grabber{width:36px;height:5px;border-radius:3px;background:var(--fg3);margin:0 auto 12px}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.close{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--fg) 10%,transparent);display:grid;place-items:center;color:var(--fg2);flex-shrink:0}
+.close svg{width:14px;height:14px}
+.res-hero{padding:20px;text-align:center}
+.res-hero .pct{font:700 clamp(3rem,16vw,4.25rem)/1 var(--font-d);letter-spacing:-.035em;color:var(--live)}
+.res-hero .cap{color:var(--fg2);font-size:.9375rem;margin-top:4px}
+.pill{display:inline-block;margin-top:12px;padding:5px 12px;border-radius:999px;font-size:.8125rem;font-weight:600}
+.split{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:18px 0 0;background:var(--card2)}
+.split i{display:block;height:100%;transition:width .4s ease-out}
+.split .a{background:var(--live-btn)} .split .b{background:var(--dead-btn)}
+.rows{margin-top:12px}
+.r{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;font-size:1rem}
+.r+.r{border-top:.5px solid var(--sep)}
+.r .k{display:flex;align-items:center;gap:10px;min-width:0}
+.r .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.r .v{font-weight:600;white-space:nowrap}
+.r .v small{color:var(--fg2);font-weight:500;margin-left:6px}
+.warnline{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);color:var(--fg);border-radius:12px;padding:10px 12px;font-size:.875rem;margin-top:12px}
+.warnline svg{width:18px;height:18px;color:var(--warn);flex-shrink:0;margin-top:1px}
+.sheet-btns{display:grid;gap:10px;margin-top:16px}
+.btn{height:50px;border-radius:14px;font-weight:600;font-size:1rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--tint-btn);color:#fff}
+.btn.plain{background:var(--card);color:var(--tint)}
+.btn.danger{background:var(--dead-btn);color:#fff}
+.confirm-text{color:var(--fg2);margin:0 0 4px;font-size:.9375rem}
+
+/* Timer pill */
+.timer{position:fixed;z-index:30;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:12px;padding:8px 8px 8px 16px;border-radius:999px;background:var(--fg);color:var(--bg);box-shadow:0 8px 30px rgba(0,0,0,.25);
+  transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .2s;max-width:calc(100% - 32px)}
+.timer.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.timer .tl{font-size:.8125rem;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.timer .tt{font:600 1.125rem var(--font-d);font-variant-numeric:tabular-nums}
+.timer button{background:color-mix(in srgb,var(--bg) 18%,transparent);color:var(--bg);border-radius:999px;padding:6px 12px;font-size:.8125rem;font-weight:600;white-space:nowrap}
+.timer.done{background:var(--live-btn);color:#fff}
+.timer.done button{color:#fff;background:rgba(255,255,255,.22)}
+.toast{position:fixed;z-index:50;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-30px);opacity:0;transition:.3s cubic-bezier(.32,.72,0,1);
+  background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.875rem;font-weight:600;pointer-events:none;white-space:nowrap}
+.toast.on{transform:translate(-50%,0);opacity:1}
+
+@media (max-width:420px){
+  .step{grid-template-columns:minmax(0,1fr)} .step .ill{width:100%;height:84px} .step .ill svg{width:120px;height:80px}
+  .legend{grid-template-columns:minmax(0,1fr)} .actions{grid-template-columns:1fr 1fr} .act.end{grid-column:1/-1}
+  h1{font-size:1.875rem}
+}
+@media (min-width:700px){ .vit-flow .steps{display:block} }
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation:none!important}
+  .sheet{transition:opacity .2s!important}
+}
+@media (prefers-reduced-transparency:reduce){ .tabbar{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none} }
+
+/* ===== Liquid Glass layer ===== */
+:root{
+  --glass:rgba(255,255,255,.5); --glass-strong:rgba(255,255,255,.74); --glass-border:rgba(255,255,255,.75);
+  --glass-hi:rgba(255,255,255,.95); --glass-shadow:rgba(31,38,64,.10); --glass-blur:blur(26px) saturate(190%);
+  --card2:rgba(118,118,128,.10);
+  --blob1:rgba(0,122,255,.30); --blob2:rgba(52,199,89,.24); --blob3:rgba(255,45,85,.22); --blob4:rgba(175,82,222,.18);
+  --bg:#EEF1F7;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --glass:rgba(40,40,46,.48); --glass-strong:rgba(34,34,40,.74); --glass-border:rgba(255,255,255,.13);
+  --glass-hi:rgba(255,255,255,.18); --glass-shadow:rgba(0,0,0,.45); --card2:rgba(118,118,128,.22);
+  --blob1:rgba(10,132,255,.34); --blob2:rgba(48,209,88,.20); --blob3:rgba(255,55,95,.24); --blob4:rgba(191,90,242,.22);
+  --bg:#05060A}}
+:root[data-theme="dark"]{
+  --glass:rgba(40,40,46,.48); --glass-strong:rgba(34,34,40,.74); --glass-border:rgba(255,255,255,.13);
+  --glass-hi:rgba(255,255,255,.18); --glass-shadow:rgba(0,0,0,.45); --card2:rgba(118,118,128,.22);
+  --blob1:rgba(10,132,255,.34); --blob2:rgba(48,209,88,.20); --blob3:rgba(255,55,95,.24); --blob4:rgba(191,90,242,.22);
+  --bg:#05060A}
+
+.bg{position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(38% 30% at 12% 8%,var(--blob1),transparent 70%),
+    radial-gradient(34% 28% at 92% 22%,var(--blob4),transparent 70%),
+    radial-gradient(40% 32% at 18% 78%,var(--blob2),transparent 70%),
+    radial-gradient(38% 30% at 88% 88%,var(--blob3),transparent 70%);
+  filter:blur(10px)}
+
+.card,.seg,.tabbar,.sheet,.act,.timer{
+  background:var(--glass);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-hi),inset 0 -1px 0 rgba(255,255,255,.08),0 10px 30px var(--glass-shadow)}
+.card{border-radius:22px}
+.step .ill{background:var(--card2);border-radius:14px}
+.chip{background:var(--card2)}
+
+/* segmented control: glass track, lifted glass thumb */
+.seg{border-radius:999px;padding:3px}
+.seg button{border-radius:999px}
+.seg button[aria-selected="true"],
+:root[data-theme="dark"] .seg button[aria-selected="true"]{background:var(--glass-strong);box-shadow:inset 0 1px 0 var(--glass-hi),0 2px 10px var(--glass-shadow)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg button[aria-selected="true"]{background:rgba(255,255,255,.16)}}
+:root[data-theme="dark"] .seg button[aria-selected="true"]{background:rgba(255,255,255,.16)}
+.target .seg{box-shadow:inset 0 1px 0 var(--glass-hi)}
+
+/* floating capsule tab bar */
+.tabbar{left:0;right:0;margin:0 auto;width:min(360px,calc(100% - 32px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));
+  bottom:calc(10px + env(safe-area-inset-bottom,0px));border-radius:999px;padding:6px;gap:4px}
+.tab{flex:1;border-radius:999px;padding:6px 0 5px;transition:background .25s,color .25s}
+.tab[aria-selected="true"]{background:var(--tint-soft);color:var(--tint)}
+.tab svg{width:24px;height:24px}
+
+/* buttons */
+.act{border-radius:999px;height:48px}
+.act.end{background:color-mix(in srgb,var(--tint-btn) 90%,transparent);border-color:rgba(255,255,255,.35);color:#fff}
+.btn{border-radius:999px}
+.btn.plain{background:var(--glass);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-hi)}
+.btn.primary,.btn.danger{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px var(--glass-shadow)}
+.tbtn{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+
+/* sheets & overlays */
+.sheet{background:var(--glass-strong);border-radius:28px 28px 0 0;border-bottom:0}
+.sheet .card{background:var(--glass)}
+.scrim{background:rgba(0,0,0,.22)}
+.close{background:var(--card2)}
+.timer{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto;transform:translate(-50%,-20px);color:var(--fg);padding:6px 6px 6px 16px}
+.timer.on{transform:translate(-50%,0)}
+.timer button{background:var(--card2);color:var(--fg)}
+.timer.done{background:color-mix(in srgb,var(--live-btn) 92%,transparent);color:#fff}
+.toast{top:calc(64px + env(safe-area-inset-top,0px));background:var(--glass-strong);color:var(--fg);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);box-shadow:0 8px 24px var(--glass-shadow)}
+.kbd kbd{background:var(--glass);border-color:var(--glass-border)}
+
+/* ===== Counter: pads docked above the tab bar ===== */
+.pads{position:fixed;z-index:15;left:0;right:0;margin:0 auto;max-width:760px;
+  bottom:calc(84px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pad{height:clamp(150px,30svh,290px);border-radius:30px;
+  -webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -12px 30px rgba(0,0,0,.10),0 14px 34px var(--glass-shadow)}
+.pad.live{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0) 45%),color-mix(in srgb,var(--live-btn) 92%,transparent)}
+.pad.dead{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0) 45%),color-mix(in srgb,var(--dead-btn) 92%,transparent)}
+.pad .cnt{font-size:clamp(2.25rem,11vw,4rem)}
+body.in-conta .wrap{padding-bottom:calc(84px + clamp(150px,30svh,290px) + 24px + env(safe-area-inset-bottom,0px))}
+#view-conta .actions{margin-top:14px}
+@media (max-height:620px){.pad{height:130px} body.in-conta .wrap{padding-bottom:calc(84px + 154px + env(safe-area-inset-bottom,0px))}}
+
+#view-conta .actions{grid-template-columns:1fr 1fr 1.3fr}
+#view-conta .act.end{grid-column:auto}
+@media (max-width:360px){#view-conta .act{font-size:.875rem;gap:4px} #view-conta .act svg{width:16px;height:16px}}
+@media (max-height:700px){#view-conta .head{padding-top:8px} #view-conta h1{font-size:1.75rem} #view-conta .ring-wrap{padding:12px 14px} #view-conta .ring{width:80px;height:80px}}
+
+@media (prefers-reduced-transparency:reduce){
+  .card,.seg,.tabbar,.sheet,.act,.timer,.toast,.btn.plain,.pad{-webkit-backdrop-filter:none;backdrop-filter:none}
+  .card,.seg,.tabbar,.act,.btn.plain,.timer,.toast{background:var(--card)} .sheet{background:var(--bg)}
+  .pad.live{background:var(--live-btn)} .pad.dead{background:var(--dead-btn)} .bg{display:none}
+}
+</style>
+</head>
+<body>
+
+
+<div class="bg" aria-hidden="true"></div>
+<div class="wrap">
+
+<!-- ============ PROTOCOLLI ============ -->
+<section id="view-protocolli">
+  <header class="head">
+    <div class="eyebrow">Laboratorio di seminologia</div>
+    <h1>Protocolli</h1>
+  </header>
+
+  <div class="seg" role="tablist" aria-label="Protocollo">
+    <button role="tab" id="seg-vital" aria-selected="true" data-proto="vital">Vitalità · VitalScreen</button>
+    <button role="tab" id="seg-grad" aria-selected="false" data-proto="grad">Gradiente 80/40</button>
+  </div>
+
+  <!-- VITALSCREEN -->
+  <div id="proto-vital">
+    <div class="card summary">
+      <h2>Vitalità spermatica</h2>
+      <p>VitalScreen (FertiPro) · colorazione eosina–nigrosina. Su seme fresco, preferibilmente entro 1 ora dall'eiaculazione. Indicata quando la motilità totale è sotto il 40%.</p>
+      <div class="chips num">
+        <span class="chip"><b>50 µL</b><span>seme</span></span>
+        <span class="chip"><b>2 gocce</b><span>R1 eosina</span></span>
+        <span class="chip"><b>3 gocce</b><span>R2 nigrosina</span></span>
+        <span class="chip"><b>20 µL</b><span>su vetrino</span></span>
+        <span class="chip"><b>100–200</b><span>cellule</span></span>
+      </div>
+    </div>
+
+    <div class="group-label">Procedura</div>
+    <ol class="card steps" data-steps="vital">
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <path class="f-semen s-tube" stroke-width="2" d="M44 18h32v30c0 14-8 26-16 26s-16-12-16-26z"/>
+          <rect class="f-card s-tube" stroke-width="2" x="40" y="10" width="40" height="9" rx="3"/>
+          <path class="f-eos" d="M22 14c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
+          <path class="f-eos" d="M22 34c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
+          <text class="svgt" x="92" y="40" font-size="11" font-weight="700">50</text><text class="svgt2" x="92" y="52" font-size="9">µL</text>
+          <text class="svgt2" x="14" y="68" font-size="9">R1 ×2</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">1</span><h3>Seme + eosina</h3><button class="check" aria-label="Segna passaggio 1 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>In una Eppendorf metti <strong>50 µL di seme</strong> e <strong>2 gocce di Reagente 1</strong> (eosina). Mescola delicatamente. Il flacone non deve toccare la provetta.</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <path class="f-eos s-tube" stroke-width="2" opacity=".85" d="M44 18h32v30c0 14-8 26-16 26s-16-12-16-26z"/>
+          <rect class="f-card s-tube" stroke-width="2" x="40" y="10" width="40" height="9" rx="3"/>
+          <path class="f-nig" d="M22 8c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
+          <path class="f-nig" d="M22 28c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
+          <path class="f-nig" d="M22 48c3 5 5 8 5 11a5 5 0 0 1-10 0c0-3 2-6 5-11z"/>
+          <circle class="f-none s-tint" stroke-width="2" cx="99" cy="38" r="13"/><path class="s-tint" stroke-width="2" stroke-linecap="round" d="M99 30v8l5 3"/>
+          <text class="svgt2" x="88" y="66" font-size="9">≤ 30 s</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">2</span><h3>Aggiungi nigrosina</h3><button class="check" aria-label="Segna passaggio 2 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p><strong>Entro 30 secondi</strong> aggiungi <strong>3 gocce di Reagente 2</strong> (nigrosina, agitato prima dell'uso). Mescola delicatamente.</p>
+          <div class="timers"><button class="tbtn" data-timer="30" data-label="Aggiungi R2"><svg viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6v3.2l2 1.2M6.5 1.8h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Timer 30 s</button></div>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <rect class="f-card s-tube" stroke-width="2" x="10" y="42" width="100" height="18" rx="2"/>
+          <rect class="f-l40 s-tint" stroke-width="1.5" x="40" y="35" width="40" height="7" rx="1" opacity=".9"/>
+          <ellipse class="f-nig" cx="60" cy="42" rx="13" ry="3"/>
+          <path class="s-fg2" stroke-width="2" stroke-linecap="round" d="M60 8v18M54 20l6 6 6-6" fill="none"/>
+          <text class="svgt" x="70" y="18" font-size="11" font-weight="700">20 µL</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">3</span><h3>Vetrino e coprioggetto</h3><button class="check" aria-label="Segna passaggio 3 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p><strong>Entro 30 secondi</strong> dall'aggiunta di R2 deposita <strong>20 µL</strong> della miscela su un vetrino e copri subito con il coprioggetto.</p>
+          <div class="timers"><button class="tbtn" data-timer="30" data-label="Vetrino"><svg viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6v3.2l2 1.2M6.5 1.8h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Timer 30 s</button></div>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <circle class="f-nig field" cx="60" cy="40" r="32"/>
+          <g transform="translate(44 30) rotate(-20)"><ellipse class="f-live" rx="5" ry="3.4"/><path class="s-live" stroke-width="1" fill="none" d="M5 0q8 3 16-2"/></g>
+          <g transform="translate(72 26) rotate(30)"><ellipse class="f-dead" rx="5" ry="3.4"/><path class="s-dead" stroke-width="1" fill="none" d="M5 0q8 3 16-2"/></g>
+          <g transform="translate(56 54) rotate(10)"><ellipse class="f-live" rx="5" ry="3.4"/><path class="s-live" stroke-width="1" fill="none" d="M5 0q8 -3 14 2"/></g>
+          <g transform="translate(78 50) rotate(-40)"><ellipse class="f-dead" rx="5" ry="3.4"/></g>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">4</span><h3>Leggi subito al microscopio</h3><button class="check" aria-label="Segna passaggio 4 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Ingrandimento <strong>400–600×</strong>. Scorri tutto il vetrino e conta <strong>100–200 spermatozoi</strong>. Se aspetti, la vitalità risulta più bassa. Non lasciare asciugare la goccia: la nigrosina cristallizza.</p>
+          <div class="timers"><button class="tbtn" data-goto="conta"><svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Apri contatore</button></div>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <path class="f-card2 s-tube" stroke-width="2" d="M40 22h40l-4 46H44z"/><path class="s-tube" stroke-width="2" stroke-linecap="round" d="M34 22h52M52 22v-6h16v6"/>
+          <path class="s-fg2" stroke-width="1.6" d="M52 32v28M60 32v28M68 32v28"/>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">5</span><h3>Elimina il materiale</h3><button class="check" aria-label="Segna passaggio 5 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Smaltisci reagenti e materiali usati dopo ogni test. Gli spermatozoi colorati non sono utilizzabili per procedure PMA.</p>
+        </div>
+      </li>
+    </ol>
+    <button class="restart" data-restart="vital">Ricomincia la procedura</button>
+
+    <div class="group-label">Come leggere il vetrino</div>
+    <div class="card figure">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Campo microscopico su fondo scuro di nigrosina: teste incolori sono vive, teste rosse e rosa tenue sono morte">
+        <rect class="f-nig field" x="1" y="1" width="638" height="198" rx="14"/>
+        <g id="sperm-live"><ellipse class="f-live" rx="9" ry="6"/><path class="s-live" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 6 28 -2t26 2"/></g>
+        <use href="#sperm-live" transform="translate(70 60) rotate(-15)"/>
+        <use href="#sperm-live" transform="translate(150 140) rotate(20)"/>
+        <use href="#sperm-live" transform="translate(300 50) rotate(160)"/>
+        <use href="#sperm-live" transform="translate(470 130) rotate(-30)"/>
+        <use href="#sperm-live" transform="translate(560 55) rotate(100)"/>
+        <g id="sperm-dead"><ellipse class="f-dead" rx="9" ry="6"/><path class="s-dead" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 -6 28 2t26 -2"/></g>
+        <use href="#sperm-dead" transform="translate(230 110) rotate(-60)"/>
+        <use href="#sperm-dead" transform="translate(380 160) rotate(10)"/>
+        <use href="#sperm-dead" transform="translate(420 70) rotate(200)"/>
+        <g transform="translate(110 100) rotate(40)"><ellipse class="f-faint" rx="9" ry="6"/><path stroke="var(--head-faint)" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 6 28 -2t26 2"/></g>
+        <g transform="translate(540 160) rotate(-10)"><ellipse class="f-faint" rx="9" ry="6"/><path stroke="var(--head-faint)" stroke-width="1.6" fill="none" stroke-linecap="round" d="M9 0q14 -6 28 2"/></g>
+      </svg>
+      <div class="legend">
+        <div><i style="background:var(--head-live)"></i><span>Testa incolore<small>Vivo</small></span></div>
+        <div><i style="background:var(--head-dead)"></i><span>Testa rossa<small>Morto</small></span></div>
+        <div><i style="background:var(--head-faint)"></i><span>Rosa tenue<small>Conta come morto</small></span></div>
+      </div>
+      <div class="scale num">
+        <div class="s-bad"><b>&lt; 50%</b><span>Anomalo</span></div>
+        <div class="s-grey"><b>50–60%</b><span>Zona grigia</span></div>
+        <div class="s-ok"><b>&gt; 60%</b><span>Normale</span></div>
+      </div>
+    </div>
+    <p class="foot">Classificazione raccomandata dal foglietto VitalScreen (rif. WHO 2021). Valuta sempre insieme alla motilità dello stesso campione.</p>
+
+    <div class="group-label">Attenzione</div>
+    <div class="card">
+      <div class="note"><svg viewBox="0 0 20 20"><path d="M10 2.5 18 17H2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4.2M10 14.6v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span><strong>Campione viscoso o a bassa concentrazione:</strong> se la nigrosina precipita, usa solo l'eosina. Dopo il passaggio 1 vai direttamente al passaggio 3.</span></div>
+      <div class="note"><svg viewBox="0 0 20 20"><path d="M10 2.5 18 17H2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4.2M10 14.6v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span><strong>Molte cellule vive ma immobili</strong> possono indicare difetti strutturali del flagello. <strong>Molte immobili e morte</strong>: astinenza lunga, patologia epididimaria o reazione immunologica da infezione.</span></div>
+    </div>
+  </div>
+
+  <!-- GRADIENTE -->
+  <div id="proto-grad" hidden>
+    <div class="card summary">
+      <h2>Separazione su gradiente di densità</h2>
+      <p>Gradiente discontinuo a due strati, 40% sopra e 80% sotto. Gli spermatozoi mobili e morfologicamente migliori attraversano entrambi gli strati e formano il pellet sul fondo.</p>
+      <div class="chips num">
+        <span class="chip"><b>1 mL</b><span>80% sul fondo</span></span>
+        <span class="chip"><b>1 mL</b><span>40% sopra</span></span>
+        <span class="chip"><b>≤ 1,5 mL</b><span>seme</span></span>
+        <span class="chip"><b>300–400 g</b><span>15–20 min</span></span>
+        <span class="chip"><b>200 g</b><span>lavaggio 5–10 min</span></span>
+      </div>
+    </div>
+
+    <div class="group-label">Prima e dopo la centrifuga</div>
+    <div class="card figure tubes">
+      <svg viewBox="0 0 320 330" role="img" aria-label="Prima della centrifuga: seme sopra, gradiente 40% al centro, 80% sul fondo">
+        <defs><clipPath id="tubeA"><path d="M30 40h80v190c0 30-20 60-40 70c-20-10-40-40-40-70z"/></clipPath></defs>
+        <text class="svgt" x="70" y="24" font-size="16" font-weight="700" text-anchor="middle">Prima</text>
+        <g clip-path="url(#tubeA)">
+          <rect class="f-card2" x="20" y="30" width="100" height="280"/>
+          <rect class="f-semen" x="20" y="88" width="100" height="52"/>
+          <rect class="f-l40" x="20" y="140" width="100" height="70"/>
+          <rect class="f-l80" x="20" y="210" width="100" height="100"/>
+        </g>
+        <path class="f-none s-tube" stroke-width="2.5" d="M30 40h80v190c0 30-20 60-40 70c-20-10-40-40-40-70z"/>
+        <path class="s-tube" stroke-width="2.5" stroke-linecap="round" d="M22 40h96"/>
+        <g class="svgt2" font-size="13">
+          <path class="s-sep" d="M112 114h18" stroke-width="1"/><text x="136" y="110" class="svgt" font-weight="600" font-size="14">Seme liquefatto</text><text x="136" y="127">fino a 1,5 mL</text>
+          <path class="s-sep" d="M112 175h18" stroke-width="1"/><text x="136" y="171" class="svgt" font-weight="600" font-size="14">Gradiente 40%</text><text x="136" y="188">1 mL, stratificato</text>
+          <path class="s-sep" d="M112 250h18" stroke-width="1"/><text x="136" y="246" class="svgt" font-weight="600" font-size="14">Gradiente 80%</text><text x="136" y="263">1 mL, sul fondo</text>
+        </g>
+      </svg>
+      <svg viewBox="0 0 320 330" role="img" aria-label="Dopo la centrifuga a 300–400 g: plasma in alto, detriti alle interfacce, cellule immobili tra 40 e 80%, pellet di spermatozoi mobili sul fondo">
+        <defs><clipPath id="tubeB"><path d="M30 40h80v190c0 30-20 60-40 70c-20-10-40-40-40-70z"/></clipPath></defs>
+        <text class="svgt" x="70" y="24" font-size="16" font-weight="700" text-anchor="middle">Dopo</text>
+        <text class="svgt2" x="136" y="24" font-size="13">300–400 g · 15–20 min</text>
+        <g clip-path="url(#tubeB)">
+          <rect class="f-card2" x="20" y="30" width="100" height="280"/>
+          <rect class="f-semen" x="20" y="88" width="100" height="50" opacity=".55"/>
+          <rect class="f-l40" x="20" y="138" width="100" height="72"/>
+          <rect class="f-l80" x="20" y="210" width="100" height="100"/>
+          <rect class="f-fg2" x="20" y="134" width="100" height="6" opacity=".5"/>
+          <rect class="f-fg2" x="20" y="206" width="100" height="6" opacity=".5"/>
+          <ellipse class="f-pellet" cx="70" cy="294" rx="16" ry="8"/>
+        </g>
+        <path class="f-none s-tube" stroke-width="2.5" d="M30 40h80v190c0 30-20 60-40 70c-20-10-40-40-40-70z"/>
+        <path class="s-tube" stroke-width="2.5" stroke-linecap="round" d="M22 40h96"/>
+        <g class="svgt2" font-size="13">
+          <path class="s-sep" d="M112 100h18" stroke-width="1"/><text x="136" y="96" class="svgt" font-weight="600" font-size="14">Plasma seminale</text><text x="136" y="113">da eliminare</text>
+          <path class="s-sep" d="M112 137h18" stroke-width="1"/><text x="136" y="141">Detriti, leucociti</text>
+          <path class="s-sep" d="M112 209h18" stroke-width="1"/><text x="136" y="205" class="svgt" font-weight="600" font-size="14">Interfaccia 40/80</text><text x="136" y="222">spermatozoi immobili</text>
+          <path class="s-tint" d="M86 294h44" stroke-width="1.5"/><text x="136" y="290" font-weight="700" font-size="14" style="fill:var(--pellet)">Pellet</text><text x="136" y="307">spermatozoi mobili</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="group-label">Procedura</div>
+    <ol class="card steps" data-steps="grad">
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <path class="f-l80 s-tube" stroke-width="2" d="M30 16h18v40c0 8-4 14-9 16-5-2-9-8-9-16z"/>
+          <path class="f-l40 s-tube" stroke-width="2" d="M56 16h18v40c0 8-4 14-9 16-5-2-9-8-9-16z"/>
+          <text class="svgt" x="82" y="42" font-size="13" font-weight="700">37°</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">1</span><h3>Prepara terreni e campione</h3><button class="check" aria-label="Segna passaggio 1 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Porta gradiente 40%, 80% e terreno di lavaggio alla temperatura indicata dal produttore (in genere <strong>37 °C</strong>). Usa seme <strong>completamente liquefatto</strong>, idealmente entro 60 min.</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <clipPath id="g2"><path d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/></clipPath>
+          <g clip-path="url(#g2)"><rect class="f-l80" x="40" y="44" width="40" height="40"/></g>
+          <path class="f-none s-tube" stroke-width="2" d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/>
+          <text class="svgt" x="80" y="62" font-size="11" font-weight="700">80%</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">2</span><h3>Strato 80% sul fondo</h3><button class="check" aria-label="Segna passaggio 2 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Metti <strong>1 mL di gradiente 80%</strong> sul fondo di una provetta conica sterile da 15 mL.</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <clipPath id="g3"><path d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/></clipPath>
+          <g clip-path="url(#g3)"><rect class="f-l80" x="40" y="44" width="40" height="40"/><rect class="f-l40" x="40" y="30" width="40" height="14"/></g>
+          <path class="f-none s-tube" stroke-width="2" d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/>
+          <path class="s-tint" stroke-width="2.5" stroke-linecap="round" d="M88 4 70 30"/>
+          <text class="svgt" x="80" y="48" font-size="11" font-weight="700">40%</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">3</span><h3>Stratifica il 40%</h3><button class="check" aria-label="Segna passaggio 3 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Aggiungi <strong>1 mL di gradiente 40%</strong> lentamente lungo la parete, con pipetta inclinata. Deve restare un'<strong>interfaccia netta</strong> tra i due strati.</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <clipPath id="g4"><path d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/></clipPath>
+          <g clip-path="url(#g4)"><rect class="f-l80" x="40" y="44" width="40" height="40"/><rect class="f-l40" x="40" y="30" width="40" height="14"/><rect class="f-semen" x="40" y="18" width="40" height="12"/></g>
+          <path class="f-none s-tube" stroke-width="2" d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/>
+          <text class="svgt2" x="80" y="28" font-size="10">seme</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">4</span><h3>Stratifica il seme</h3><button class="check" aria-label="Segna passaggio 4 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Deposita <strong>fino a 1–1,5 mL di seme</strong> sopra il 40%, senza mescolare gli strati. Con campioni abbondanti prepara più provette.</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <circle class="f-none s-tube" stroke-width="2" cx="60" cy="40" r="28"/><circle class="f-card s-tube" stroke-width="2" cx="60" cy="40" r="6"/>
+          <path class="s-tint f-none" stroke-width="2.5" stroke-linecap="round" d="M60 6a34 34 0 0 1 32 22"/><path class="s-tint" stroke-width="2.5" stroke-linecap="round" d="M92 28l2-9M92 28l-9-1"/>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">5</span><h3>Centrifuga</h3><button class="check" aria-label="Segna passaggio 5 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p><strong>300–400 g per 15–20 minuti</strong>, rotore basculante. Imposta g e non rpm: dipendono dal raggio del rotore.</p>
+          <div class="timers">
+            <button class="tbtn" data-timer="900" data-label="Centrifuga gradiente"><svg viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6v3.2l2 1.2M6.5 1.8h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>15 min</button>
+            <button class="tbtn" data-timer="1200" data-label="Centrifuga gradiente"><svg viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6v3.2l2 1.2M6.5 1.8h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>20 min</button>
+          </div>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <clipPath id="g6"><path d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/></clipPath>
+          <g clip-path="url(#g6)"><rect class="f-l80" x="40" y="50" width="40" height="34" opacity=".55"/><ellipse class="f-pellet" cx="60" cy="68" rx="6" ry="3.5"/></g>
+          <path class="f-none s-tube" stroke-width="2" d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/>
+          <path class="s-fg2" stroke-width="2.5" stroke-linecap="round" d="M60 0v44"/>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">6</span><h3>Recupera il pellet</h3><button class="check" aria-label="Segna passaggio 6 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Aspira dall'alto plasma seminale, strato 40% e interfacce. Preleva il <strong>pellet</strong> con una pipetta pulita e trasferiscilo in una provetta nuova.</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <clipPath id="g7"><path d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/></clipPath>
+          <g clip-path="url(#g7)"><rect class="f-l40" x="40" y="26" width="40" height="58"/></g>
+          <path class="f-none s-tube" stroke-width="2" d="M48 12h24v44c0 8-5 14-12 16-7-2-12-8-12-16z"/>
+          <text class="svgt" x="80" y="40" font-size="11" font-weight="700">wash</text>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">7</span><h3>Lava</h3><button class="check" aria-label="Segna passaggio 7 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Risospendi in <strong>2–5 mL di terreno di lavaggio</strong> e centrifuga a <strong>200 g per 5–10 minuti</strong> per eliminare il gradiente residuo.</p>
+          <div class="timers">
+            <button class="tbtn" data-timer="300" data-label="Lavaggio"><svg viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6v3.2l2 1.2M6.5 1.8h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>5 min</button>
+            <button class="tbtn" data-timer="600" data-label="Lavaggio"><svg viewBox="0 0 16 16"><circle cx="8" cy="9" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6v3.2l2 1.2M6.5 1.8h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>10 min</button>
+          </div>
+        </div>
+      </li>
+      <li class="step">
+        <div class="ill" aria-hidden="true"><svg viewBox="0 0 120 80">
+          <circle class="f-nig field" cx="60" cy="40" r="28"/>
+          <g transform="translate(48 32) rotate(-15)"><ellipse class="f-live" rx="4.5" ry="3"/><path class="s-live" stroke-width="1" fill="none" d="M4 0q7 3 14-2"/></g>
+          <g transform="translate(62 50) rotate(25)"><ellipse class="f-live" rx="4.5" ry="3"/><path class="s-live" stroke-width="1" fill="none" d="M4 0q7 -3 14 2"/></g>
+          <g transform="translate(70 30) rotate(120)"><ellipse class="f-live" rx="4.5" ry="3"/><path class="s-live" stroke-width="1" fill="none" d="M4 0q7 3 14-2"/></g>
+        </svg></div>
+        <div class="body">
+          <div class="row"><span class="n">8</span><h3>Risospendi e valuta</h3><button class="check" aria-label="Segna passaggio 8 come fatto"><svg viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p>Elimina il surnatante e risospendi il pellet in <strong>0,3–0,5 mL</strong> di terreno. Valuta concentrazione e motilità prima dell'uso.</p>
+        </div>
+      </li>
+    </ol>
+    <button class="restart" data-restart="grad">Ricomincia la procedura</button>
+    <p class="foot">Volumi, g e tempi sono i valori di riferimento più usati (manuale WHO 2021). Il foglietto del terreno in uso nel tuo laboratorio ha la precedenza.</p>
+  </div>
+</section>
+
+<!-- ============ CONTA ============ -->
+<section id="view-conta" hidden>
+  <header class="head">
+    <div class="eyebrow">Vitalità · eosina–nigrosina</div>
+    <h1>Contatore</h1>
+  </header>
+
+  <div class="card ring-wrap">
+    <div class="ring" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="42" fill="none" stroke-width="10"/>
+        <circle id="ring-live" class="lv" cx="50" cy="50" r="42" fill="none" stroke-width="10" stroke-dasharray="0 264"/>
+        <circle id="ring-dead" class="dd" cx="50" cy="50" r="42" fill="none" stroke-width="10" stroke-dasharray="0 264"/></svg>
+      <div class="c"><b id="tot" class="num">0</b><span id="tot-of" class="num">di 200</span></div>
+    </div>
+    <div class="ring-info">
+      <div class="big num" id="live-pct">—</div>
+      <div class="sub" id="live-sub">Inizia a contare</div>
+      <div class="target"><span>Obiettivo</span>
+        <div class="seg" role="radiogroup" aria-label="Obiettivo di conteggio">
+          <button role="radio" aria-selected="false" data-target="100">100</button>
+          <button role="radio" aria-selected="true" data-target="200">200</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pads">
+    <button class="pad live" id="pad-live" aria-label="Vivo, aggiungi uno">
+      <span class="plus">+1</span><span class="lbl">Vivo</span><span class="cnt" id="n-live">0</span><span class="hint">testa incolore</span>
+    </button>
+    <button class="pad dead" id="pad-dead" aria-label="Morto, aggiungi uno">
+      <span class="plus">+1</span><span class="lbl">Morto</span><span class="cnt" id="n-dead">0</span><span class="hint">testa rossa o rosa</span>
+    </button>
+  </div>
+
+  <div class="actions">
+    <button class="act undo" id="btn-undo" disabled><svg viewBox="0 0 20 20"><path d="M7 5 3 9l4 4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 9H12a5 5 0 0 1 0 10h-2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span>Annulla</span></button>
+    <button class="act reset" id="btn-reset" disabled><svg viewBox="0 0 20 20"><path d="M3.5 10a6.5 6.5 0 1 0 2-4.7M3 3v4h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Azzera</span></button>
+    <button class="act end" id="btn-end" disabled><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Fine</span></button>
+  </div>
+  <p class="kbd">Da tastiera: <kbd>V</kbd> vivo · <kbd>M</kbd> morto · <kbd>⌫</kbd> annulla · <kbd>Invio</kbd> fine</p>
+</section>
+</div>
+
+<nav class="tabbar" role="tablist" aria-label="Sezioni">
+  <button class="tab" role="tab" data-view="protocolli" aria-selected="true">
+    <svg viewBox="0 0 28 28"><rect x="6" y="3.5" width="16" height="21" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 9h8M10 13h8M10 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    Protocolli</button>
+  <button class="tab" role="tab" data-view="conta" aria-selected="false">
+    <svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14 9v10M9 14h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    Contatore</button>
+</nav>
+
+<div class="timer" id="timer" role="status" aria-live="polite">
+  <span class="tl" id="timer-label">Timer</span><span class="tt" id="timer-time">00:00</span><button id="timer-stop">Stop</button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<div class="sheet" id="sheet-result" role="dialog" aria-modal="true" aria-labelledby="res-title" hidden>
+  <div class="grabber"></div>
+  <div class="sheet-head"><h2 id="res-title">Risultato</h2><button class="close" data-close aria-label="Chiudi"><svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+  <div class="card res-hero">
+    <div class="pct num" id="r-pct">0%</div>
+    <div class="cap">Spermatozoi vivi</div>
+    <span class="pill" id="r-pill"></span>
+    <div class="split" aria-hidden="true"><i class="a" id="r-bar-a"></i><i class="b" id="r-bar-b"></i></div>
+  </div>
+  <div class="card rows num">
+    <div class="r"><span class="k"><span class="dot" style="background:var(--live-btn)"></span>Vivi</span><span class="v" id="r-live"></span></div>
+    <div class="r"><span class="k"><span class="dot" style="background:var(--dead-btn)"></span>Morti</span><span class="v" id="r-dead"></span></div>
+    <div class="r"><span class="k">Totale contati</span><span class="v" id="r-tot"></span></div>
+  </div>
+  <div class="warnline" id="r-warn" hidden><svg viewBox="0 0 20 20"><path d="M10 2.5 18 17H2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4.2M10 14.6v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="r-warn-t"></span></div>
+  <div class="sheet-btns">
+    <button class="btn plain" id="btn-copy">Copia risultato</button>
+    <button class="btn primary" id="btn-new">Nuovo conteggio</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet-reset" role="dialog" aria-modal="true" aria-labelledby="rs-title" hidden>
+  <div class="grabber"></div>
+  <div class="sheet-head"><h2 id="rs-title">Azzerare il conteggio?</h2><button class="close" data-close aria-label="Annulla"><svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+  <p class="confirm-text num" id="rs-text"></p>
+  <div class="sheet-btns">
+    <button class="btn danger" id="btn-reset-yes">Azzera</button>
+    <button class="btn plain" data-close>Continua a contare</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const fmt = new Intl.NumberFormat('it-IT');
+  const fmt1 = new Intl.NumberFormat('it-IT', {minimumFractionDigits:1, maximumFractionDigits:1});
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  };
+  let openSheet = null;
+  const buzz = ms => { try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} };
+
+  /* ---------- Navigation ---------- */
+  function show(view){
+    if(!['protocolli','conta'].includes(view)) view = 'protocolli';
+    if(typeof close === 'function') close();
+    document.body.classList.toggle('in-conta', view === 'conta');
+    $('#view-protocolli').hidden = view !== 'protocolli';
+    $('#view-conta').hidden = view !== 'conta';
+    $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.view === view));
+    if(location.hash !== '#'+view) history.replaceState(null,'','#'+view);
+    window.scrollTo(0,0);
+  }
+  $$('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.view)));
+  $$('[data-goto]').forEach(b => b.addEventListener('click', () => show(b.dataset.goto)));
+  window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+
+  function proto(p){
+    $('#proto-vital').hidden = p !== 'vital';
+    $('#proto-grad').hidden = p !== 'grad';
+    $$('[data-proto]').forEach(b => b.setAttribute('aria-selected', b.dataset.proto === p));
+    store.set('sem.proto', p);
+  }
+  $$('[data-proto]').forEach(b => b.addEventListener('click', () => proto(b.dataset.proto)));
+  proto(store.get('sem.proto','vital'));
+  show(location.hash.slice(1) || 'protocolli');
+
+  /* ---------- Step checklist ---------- */
+  $$('.check').forEach(c => c.addEventListener('click', () => {
+    const li = c.closest('.step'); const on = li.classList.toggle('done');
+    c.setAttribute('aria-pressed', on); buzz(8);
+  }));
+  $$('[data-restart]').forEach(b => b.addEventListener('click', () => {
+    $$(`[data-steps="${b.dataset.restart}"] .step`).forEach(li => li.classList.remove('done'));
+    toast('Procedura azzerata');
+  }));
+
+  /* ---------- Toast ---------- */
+  let toastT;
+  function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1600); }
+
+  /* ---------- Timer ---------- */
+  let tEnd = 0, tInt = null, audio;
+  const mmss = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  function beep(){
+    try{
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      [0, .35, .7].forEach(d => {
+        const o = audio.createOscillator(), g = audio.createGain();
+        o.frequency.value = 880; o.connect(g); g.connect(audio.destination);
+        g.gain.setValueAtTime(.0001, audio.currentTime+d); g.gain.exponentialRampToValueAtTime(.3, audio.currentTime+d+.02);
+        g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime+d+.25);
+        o.start(audio.currentTime+d); o.stop(audio.currentTime+d+.3);
+      });
+    }catch(e){}
+  }
+  function tick(){
+    const left = Math.max(0, Math.round((tEnd - Date.now())/1000));
+    $('#timer-time').textContent = mmss(left);
+    if(left <= 0){
+      clearInterval(tInt); tInt = null;
+      $('#timer').classList.add('done'); $('#timer-time').textContent = 'Fatto'; $('#timer-stop').textContent = 'Chiudi';
+      beep(); buzz([200,100,200]);
+    }
+  }
+  $$('[data-timer]').forEach(b => b.addEventListener('click', () => {
+    try{ audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); }catch(e){}
+    const secs = +b.dataset.timer;
+    tEnd = Date.now() + secs*1000;
+    $('#timer-label').textContent = b.dataset.label;
+    $('#timer-stop').textContent = 'Stop';
+    $('#timer').classList.remove('done'); $('#timer').classList.add('on');
+    clearInterval(tInt); tick(); tInt = setInterval(tick, 250);
+  }));
+  $('#timer-stop').addEventListener('click', () => { clearInterval(tInt); tInt = null; $('#timer').classList.remove('on','done'); });
+
+  /* ---------- Counter ---------- */
+  const MAX = 9999;
+  let st = store.get('sem.count', {live:0, dead:0, hist:[], target:200});
+  if(!Array.isArray(st.hist)) st.hist = [];
+  const C = 2*Math.PI*42;
+
+  function pctLive(){ const t = st.live + st.dead; return t ? st.live/t*100 : 0; }
+  function cls(p){
+    if(p < 50) return {t:'Anomalo · sotto 50%', bg:'var(--dead-soft)', fg:'var(--dead)'};
+    if(p <= 60) return {t:'Zona grigia · 50–60%', bg:'var(--warn-soft)', fg:'var(--warn)'};
+    return {t:'Normale · sopra 60%', bg:'var(--live-soft)', fg:'var(--live)'};
+  }
+  function render(){
+    const tot = st.live + st.dead;
+    $('#n-live').textContent = fmt.format(st.live);
+    $('#n-dead').textContent = fmt.format(st.dead);
+    $('#tot').textContent = fmt.format(tot);
+    $('#tot-of').textContent = 'di ' + st.target;
+    const base = Math.max(tot, st.target);
+    const lv = st.live/base*C, dd = st.dead/base*C;
+    $('#ring-live').setAttribute('stroke-dasharray', `${lv} ${C}`);
+    $('#ring-dead').setAttribute('stroke-dasharray', `${dd} ${C}`);
+    $('#ring-dead').setAttribute('stroke-dashoffset', -lv);
+    if(tot){
+      $('#live-pct').textContent = fmt1.format(pctLive()) + '% vivi';
+      const rem = st.target - tot;
+      $('#live-sub').innerHTML = rem > 0 ? `Mancano ${fmt.format(rem)} ${rem === 1 ? 'cellula' : 'cellule'}` : `<span class="reached">Obiettivo raggiunto</span>`;
+    } else { $('#live-pct').textContent = '—'; $('#live-sub').textContent = 'Inizia a contare'; }
+    $$('[data-target]').forEach(b => b.setAttribute('aria-selected', +b.dataset.target === st.target));
+    $('#btn-undo').disabled = !st.hist.length;
+    $('#btn-reset').disabled = !tot;
+    $('#btn-end').disabled = !tot;
+    store.set('sem.count', st);
+  }
+  function add(kind){
+    if(st.live + st.dead >= MAX){ toast('Limite di 9.999 cellule'); return; }
+    st[kind]++; st.hist.push(kind); if(st.hist.length > 2000) st.hist.shift();
+    const tot = st.live + st.dead;
+    buzz(tot === st.target ? [30,60,30] : 10);
+    if(tot === st.target) toast(`Raggiunte ${st.target} cellule`);
+    const pad = kind === 'live' ? $('#pad-live') : $('#pad-dead');
+    const p = pad.querySelector('.plus'); p.classList.remove('go'); void p.offsetWidth; p.classList.add('go');
+    render();
+  }
+  function undo(){
+    const k = st.hist.pop(); if(!k) return;
+    if(st[k] > 0) st[k]--; buzz(6); render(); toast(k === 'live' ? 'Tolto un vivo' : 'Tolto un morto');
+  }
+  function reset(){ st.live = 0; st.dead = 0; st.hist = []; render(); }
+
+  // press on pointer-down for instant response (no 300ms delay)
+  [['#pad-live','live'],['#pad-dead','dead']].forEach(([sel,kind]) => {
+    const el = $(sel);
+    el.addEventListener('pointerdown', e => {
+      if(e.button > 0) return;
+      el.classList.add('pressed');
+      const r = el.getBoundingClientRect(), d = Math.max(r.width, r.height)*2;
+      const rp = document.createElement('span'); rp.className = 'ripple';
+      rp.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+      el.appendChild(rp); setTimeout(() => rp.remove(), 500);
+      add(kind);
+    });
+    const up = () => el.classList.remove('pressed');
+    el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
+    el.addEventListener('click', e => { if(e.detail === 0) add(kind); }); // keyboard activation
+    el.addEventListener('contextmenu', e => e.preventDefault());
+  });
+  $('#btn-undo').addEventListener('click', undo);
+  $$('[data-target]').forEach(b => b.addEventListener('click', () => { st.target = +b.dataset.target; render(); }));
+
+  /* ---------- Sheets ---------- */
+  function open(id){
+    const s = $(id), sc = $('#scrim');
+    sc.hidden = false; s.hidden = false;
+    requestAnimationFrame(() => { sc.classList.add('on'); s.classList.add('on'); });
+    openSheet = s; s.querySelector('button').focus({preventScroll:true});
+  }
+  function close(){
+    if(!openSheet) return;
+    const s = openSheet, sc = $('#scrim'); openSheet = null;
+    s.classList.remove('on'); sc.classList.remove('on');
+    setTimeout(() => { s.hidden = true; sc.hidden = true; }, 380);
+  }
+  $('#scrim').addEventListener('click', close);
+  $$('[data-close]').forEach(b => b.addEventListener('click', close));
+
+  $('#btn-reset').addEventListener('click', () => {
+    const tot = st.live + st.dead;
+    $('#rs-text').textContent = `Perderai ${fmt.format(tot)} ${tot === 1 ? 'cellula contata' : 'cellule contate'} (${fmt.format(st.live)} vivi, ${fmt.format(st.dead)} morti).`;
+    open('#sheet-reset');
+  });
+  $('#btn-reset-yes').addEventListener('click', () => { reset(); close(); toast('Conteggio azzerato'); });
+
+  let lastText = '';
+  function finish(){
+    const tot = st.live + st.dead; if(!tot) return;
+    const pl = st.live/tot*100, pd = 100 - pl;
+    const c = cls(pl);
+    $('#r-pct').textContent = fmt1.format(pl) + '%';
+    $('#r-pct').style.color = c.fg;
+    $('#r-pill').textContent = c.t; $('#r-pill').style.background = c.bg; $('#r-pill').style.color = c.fg;
+    $('#r-bar-a').style.width = pl + '%'; $('#r-bar-b').style.width = pd + '%';
+    $('#r-live').innerHTML = `${fmt.format(st.live)}<small>${fmt1.format(pl)}%</small>`;
+    $('#r-dead').innerHTML = `${fmt.format(st.dead)}<small>${fmt1.format(pd)}%</small>`;
+    $('#r-tot').textContent = fmt.format(tot);
+    const w = $('#r-warn');
+    if(tot < 100){ w.hidden = false; $('#r-warn-t').textContent = `Hai contato ${fmt.format(tot)} ${tot === 1 ? 'cellula' : 'cellule'}. Il foglietto VitalScreen indica 100–200 cellule per un risultato affidabile.`; }
+    else w.hidden = true;
+    const d = new Date();
+    lastText = `Vitalità (eosina-nigrosina) – ${d.toLocaleDateString('it-IT')} ${d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}\nVivi: ${st.live} (${fmt1.format(pl)}%)\nMorti: ${st.dead} (${fmt1.format(pd)}%)\nTotale: ${tot}\nEsito: ${c.t}`;
+    buzz(20); open('#sheet-result');
+  }
+  $('#btn-end').addEventListener('click', finish);
+  $('#btn-new').addEventListener('click', () => { reset(); close(); toast('Pronto per un nuovo conteggio'); });
+  $('#btn-copy').addEventListener('click', () => {
+    const ok = () => toast('Risultato copiato');
+    const fallback = () => {
+      const ta = document.createElement('textarea'); ta.value = lastText; ta.setAttribute('readonly',''); ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); ok(); }catch(e){ toast('Copia non riuscita'); } ta.remove();
+    };
+    try{ navigator.clipboard.writeText(lastText).then(ok, fallback); }catch(e){ fallback(); }
+  });
+
+  /* ---------- Keyboard ---------- */
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){ close(); return; }
+    if($('#view-conta').hidden || openSheet || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if(k === 'v' || k === '1'){ e.preventDefault(); add('live'); }
+    else if(k === 'm' || k === '2'){ e.preventDefault(); add('dead'); }
+    else if(k === 'backspace' || k === 'z'){ e.preventDefault(); undo(); }
+    else if(k === 'enter' && document.activeElement.tagName !== 'BUTTON'){ e.preventDefault(); finish(); }
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
